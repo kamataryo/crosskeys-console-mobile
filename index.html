@@ -7,8 +7,8 @@
     <style>
       html, body {
         height: 100%;
-        overflow: hidden;
         margin: 0;
+        overflow: hidden;
       }
       .v-wrap {
         display: flex;
@@ -27,12 +27,30 @@
         padding: 0;
       }
       .button {
+        position: relative;
+        transition: none;
+        outline: none;
+        box-shadow: 0 3px 0 #ff43a1;
+        border: 1px solid #c71585;
         font-size: 20px;
         font-weight: bold;
         border-radius: 0;
-        -webkit-appearance: none;
         height: 100%;
-        background-color: lightgray;
+        background: #ffd9eb; /* Old browsers */
+        background: -moz-linear-gradient(top, white 0%, #ffd9eb 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(top, white 0%,#ffd9eb 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(to bottom, white 0%,#ffd9eb 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='white', endColorstr='#ffd9eb',GradientType=0 ); /* IE6-9 */
+        border-radius: 4px;
+        -webkit-transition: none;
+        -webkit-appearance: none;
+      }
+      .button:hover {
+        cursor: pointer;
+      }
+      .button:active, .is-active {
+        top: 3px;
+        box-shadow: none;
       }
       .flex-1 {
         padding: 0;
@@ -43,22 +61,55 @@
     <title>cross keys</title>
   </head>
   <body>
-    <form method="get" class="v-wrap">
+    <div class="v-wrap">
       <div class="h-wrap">
         <div class="padding flex-1"><!--詰め物--></div>
-        <button class="button flex-1" type="submit" id="front" name="front" value="1">前進</button>
+        <button class="button flex-1" id="front" value="1">前進</button>
         <div class="padding flex-1"><!--詰め物--></div>
       </div>
       <div class="h-wrap">
-        <button class="button flex-1" type="submit" id="left" name="left" value="1">左旋回</button>
-        <button class="button flex-1" type="submit" id="stop" name="stop" value="1">停止</button>
-        <button class="button flex-1" type="submit" id="right" name="right" value="1">右旋回</button>
+        <button class="button flex-1" id="left" value="1">左旋回</button>
+        <button class="button flex-1" id="stop" value="1">停止</button>
+        <button class="button flex-1" id="right" value="1">右旋回</button>
       </div>
       <div class="h-wrap">
         <div class="padding flex-1"><!--詰め物--></div>
-        <button class="button flex-1" type="submit" id="back" name="back" value="1">後退</button>
+        <button class="button flex-1" id="back" value="1">後退</button>
         <div class="padding flex-1"><!--詰め物--></div>
       </div>
-    </form>
+    </div>
+    <script>
+      const front = document.getElementById('front')
+      const left  = document.getElementById('left')
+      const right = document.getElementById('right')
+      const back  = document.getElementById('back')
+      const stop  = document.getElementById('stop')
+
+      front.addEventListener('click', () => fetch('http://example.com/front'))
+      left.addEventListener('click', () => fetch('http://example.com/left'))
+      right.addEventListener('click', () => fetch('http://example.com/right'))
+      back.addEventListener('click', () => fetch('http://example.com/back'))
+      stop.addEventListener('click', () => fetch('http://example.com/stop'))
+
+      const activate = element => {
+        element.classList.add('is-active')
+        element.click()
+      }
+
+      document
+        .addEventListener('keydown', e => {
+          if (e.key === 'ArrowUp') { activate(front) }
+          else if (e.key === 'ArrowLeft') { activate(left) }
+          else if (e.key === 'ArrowRight') { activate(right) }
+          else if (e.key === 'ArrowDown') { activate(back) }
+          else if (e.keyCode === 32) { activate(stop) }
+        })
+        
+      document
+        .addEventListener('keyup', e => (
+          [front, left, right, back, stop]
+            .forEach(element => element.classList.remove('is-active'))
+        ))
+    </script>
   </body>
 </html>
