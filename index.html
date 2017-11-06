@@ -2,7 +2,7 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <style>
       html, body {
@@ -41,7 +41,9 @@
         background: -webkit-linear-gradient(top, white 0%,#ffd9eb 100%); /* Chrome10-25,Safari5.1-6 */
         background: linear-gradient(to bottom, white 0%,#ffd9eb 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
         filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='white', endColorstr='#ffd9eb',GradientType=0 ); /* IE6-9 */
+        transition-duration: 0.2s;
         border-radius: 4px;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);  /* iOSで出てくる黒い影を消す */
         -webkit-transition: none;
         -webkit-appearance: none;
       }
@@ -79,32 +81,53 @@
       </div>
     </div>
     <script>
+      // スクロールを殺す
+      document.addEventListener('touchmove', e => e.preventDefault())
+
+      // ダブルタップで拡大してしまうのを防ぐ 
+      let flag = false
+      document.addEventListener('touchend', event => {
+        if (flag) {
+          event.preventDefault()
+        } else {
+          flag = true
+          setTimeout(() => flag = false, 500)
+        }
+      }, true)
+
+      // スマホの場合はclickではなくタッチを使う
+      const touchclick = window.ontouchstart ? 'touchstart' : 'click'
+
       const front = document.getElementById('front')
       const left  = document.getElementById('left')
       const right = document.getElementById('right')
       const back  = document.getElementById('back')
       const stop  = document.getElementById('stop')
 
-      front.addEventListener('click', () => fetch('http://example.com/front'))
-      left.addEventListener('click', () => fetch('http://example.com/left'))
-      right.addEventListener('click', () => fetch('http://example.com/right'))
-      back.addEventListener('click', () => fetch('http://example.com/back'))
-      stop.addEventListener('click', () => fetch('http://example.com/stop'))
+      front.addEventListener(touchclick, () => fetch('http://example.com/front'))
+      left.addEventListener(touchclick, () => fetch('http://example.com/left'))
+      right.addEventListener(touchclick, () => fetch('http://example.com/right'))
+      back.addEventListener(touchclick, () => fetch('http://example.com/back'))
+      stop.addEventListener(touchclick, () => fetch('http://example.com/stop'))
 
-      const activate = element => {
-        element.classList.add('is-active')
-        element.click()
-      }
+      front.addEventListener('')
 
+      // キーボードでの操作 (ボタン押下時)
       document
         .addEventListener('keydown', e => {
+          const activate = element => {
+            element.classList.add('is-active')
+            element.click()
+          }
+          
           if (e.key === 'ArrowUp') { activate(front) }
           else if (e.key === 'ArrowLeft') { activate(left) }
           else if (e.key === 'ArrowRight') { activate(right) }
           else if (e.key === 'ArrowDown') { activate(back) }
           else if (e.keyCode === 32) { activate(stop) }
         })
-        
+
+      // キーボードでの操作 (ボタンを離した時)
       document
         .addEventListener('keyup', e => (
           [front, left, right, back, stop]
