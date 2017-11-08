@@ -115,11 +115,11 @@
       // スマホの場合はclickではなくタッチを使う
       const touchclick = window.ontouchstart === null ? 'touchstart' : 'mousedown'
 
-      front.addEventListener(touchclick, () => fetchAndPlay('http://example.com/front'))
-      left.addEventListener(touchclick, () => fetchAndPlay('http://example.com/left'))
-      right.addEventListener(touchclick, () => fetchAndPlay('http://example.com/right'))
-      back.addEventListener(touchclick, () => fetchAndPlay('http://example.com/back'))
-      stop.addEventListener(touchclick, () => fetchAndPlay('http://example.com/stop'))
+      front.addEventListener(touchclick, () => fetchAndPlay('?front=1'))
+      left.addEventListener(touchclick, () => fetchAndPlay('?left=1'))
+      right.addEventListener(touchclick, () => fetchAndPlay('?right=1'))
+      back.addEventListener(touchclick, () => fetchAndPlay('?back=1'))
+      stop.addEventListener(touchclick, () => fetchAndPlay('?stop=1'))
 
       // キーボードでの操作 (ボタン押下時)
       document.addEventListener('keydown', e => {
