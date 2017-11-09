@@ -82,53 +82,70 @@
       </div>
     </div>
     <script>
+
       // スクロールを殺す
       document.addEventListener('touchmove', e => e.preventDefault())
-      // ダブルタップで拡大してしまうのを防ぐ 
-      let flag = false
-      document.addEventListener('touchend', event => {
-        if (flag) {
-          event.preventDefault()
-        } else {
-          flag = true
-          setTimeout(() => flag = false, 500)
-        }
-      }, true)
 
-      const front = document.getElementById('front')
-      const left  = document.getElementById('left')
-      const right = document.getElementById('right')
-      const back  = document.getElementById('back')
-      const stop  = document.getElementById('stop')
+      // iOSで、画面ダブルタップで拡大してしまうのを防ぐ 
+      {
+        let flag = false
+        document.addEventListener('touchend', event => {
+          if (flag) {
+            event.preventDefault()
+          } else {
+            flag = true
+            setTimeout(() => flag = false, 500)
+          }
+        }, true)
+      }
+      
+      // ボタン種類の定義
+      const buttonTypes = ['front', 'left', 'right', 'back', 'stop']
+      // ボタンのキーマップを定義
+      const keyMap = {
+        38: 'front',
+        37: 'left',
+        39: 'right',
+        40: 'back',
+        32 : 'stop', // スペース
+      }
+      // ボタンのイベントクリックのリスナーを作成
+      const createClickLisnter = type => () => fetch('?' + type + '=1')
+        .catch(err => console.err(JSON.stringify(err)))
 
-      // スマホの場合はclickではなくタッチを使う
+      //ボタンエレメントの取得
+      const buttons = buttonTypes.reduce((prev, type) => {
+        prev[type] = document.getElementById(type)
+        return prev
+      }, {})
+
+      // スマートフォンの場合はclickではなくタッチを使う
       const touchclick = window.ontouchstart === null ? 'touchstart' : 'mousedown'
+      // ボタンにイベントリスナーをつける
+      Object.keys(buttons)
+        .forEach(type => buttons[type]
+          .addEventListener(touchclick, createClickLisnter(type))
+        )
+        
 
-      front.addEventListener(touchclick, () => fetch('?front=1'))
-      left.addEventListener(touchclick, () => fetch('?left=1'))
-      right.addEventListener(touchclick, () => fetch('?right=1'))
-      back.addEventListener(touchclick, () => fetch('?back=1'))
-      stop.addEventListener(touchclick, () => fetch('?stop=1'))
-
-      // キーボードでの操作 (ボタン押下時)
+      // キーボードでの操作の定義 (ボタン押下時)
       document.addEventListener('keydown', e => {
-        const activate = element => {
+
+        // クリックとエフェクトのエミュレートする関数を作成
+        const emulateClick = element => {
           element.classList.add('is-active')
-          sound.play()
           element.click()
         }
-        if (e.key === 'ArrowUp') { activate(front) }
-        else if (e.key === 'ArrowLeft') { activate(left) }
-        else if (e.key === 'ArrowRight') { activate(right) }
-        else if (e.key === 'ArrowDown') { activate(back) }
-        else if (e.keyCode === 32) { activate(stop) }
+        keyMap[e.keyCode] && emulateClick(buttons[keyMap[e.keyCode]])
       })
 
-      // キーボードでの操作 (ボタンを離した時)
+      // キーボードでの操作の定義 (ボタンを離した時)
       document.addEventListener('keyup', e => (
-        [front, left, right, back, stop].forEach(element => element.classList.remove('is-active'))
+        // ボタンのアクティブ状態を解除する
+        Object.values(buttons)
+          .forEach(element => element.classList.remove('is-active'))
       ))
-      
+
     </script>
   </body>
 </html>
