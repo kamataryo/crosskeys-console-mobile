@@ -26,7 +26,7 @@
         margin: 5px;
         padding: 0;
       }
-      .button {
+      .btn {
         position: relative;
         transition: none;
         outline: none;
@@ -48,103 +48,112 @@
         -webkit-transition: none;
         -webkit-appearance: none;
       }
-      .button:hover {
+      .btn:hover {
         cursor: pointer;
       }
-      .button:active, .is-active {
+      .btn:active, .is-active {
         top: 3px;
         box-shadow: none;
       }
-      .flex-1 {
+      .f1 {
         padding: 0;
         margin: auto 5px;
         flex: 1;
       }
     </style>
-    <title>cross keys</title>
+    <title>crosskey</title>
   </head>
   <body>
     <div class="v-wrap">
       <div class="h-wrap">
-        <div class="padding flex-1"><!--詰め物--></div>
-        <button class="button flex-1" id="front" value="1">前進</button>
-        <div class="padding flex-1"><!--詰め物--></div>
+        <div class="f1"></div>
+        <button class="btn f1" id="front">前進</button>
+        <div class="f1"></div>
       </div>
       <div class="h-wrap">
-        <button class="button flex-1" id="left" value="1">左旋回</button>
-        <button class="button flex-1" id="stop" value="1">停止</button>
-        <button class="button flex-1" id="right" value="1">右旋回</button>
+        <button class="btn f1" id="left">左旋回</button>
+        <button class="btn f1" id="stop">停止</button>
+        <button class="btn f1" id="right">右旋回</button>
       </div>
       <div class="h-wrap">
-        <div class="padding flex-1"><!--詰め物--></div>
-        <button class="button flex-1" id="back" value="1">後退</button>
-        <div class="padding flex-1"><!--詰め物--></div>
+        <div class="f1"><!--詰め物--></div>
+        <button class="btn f1" id="back">後退</button>
+        <div class="f1"><!--詰め物--></div>
       </div>
     </div>
     <script>
+// minify用にブロックスコープを作る
+{
+  // global由来の変数をスコープに閉じ込める
+  let localDocument = document
+  let LocalObject = Object
 
-      // スクロールを殺す
-      document.addEventListener('touchmove', e => e.preventDefault())
+  // 長くてたくさん使っているメソッド名文字列もローカルで持っておく
+  let addEventListener = 'addEventListener'
 
-      // iOSで、画面ダブルタップで拡大してしまうのを防ぐ 
-      {
-        let flag = false
-        document.addEventListener('touchend', event => {
-          if (flag) {
-            event.preventDefault()
-          } else {
-            flag = true
-            setTimeout(() => flag = false, 500)
-          }
-        }, true)
-      }
-      
-      // ボタン種類の定義
-      const buttonTypes = ['front', 'left', 'right', 'back', 'stop']
-      // ボタンのキーマップを定義
-      const keyMap = {
-        38: 'front',
-        37: 'left',
-        39: 'right',
-        40: 'back',
-        32 : 'stop', // スペース
-      }
-      // ボタンのイベントクリックのリスナーを作成
-      const createClickLisnter = type => () => fetch('?' + type + '=1')
-        .catch(err => console.err(JSON.stringify(err)))
+  // スクロールを殺す
+  localDocument[addEventListener]('touchmove', e => e.preventDefault())
 
-      //ボタンエレメントの取得
-      const buttons = buttonTypes.reduce((prev, type) => {
-        prev[type] = document.getElementById(type)
-        return prev
-      }, {})
-
-      // スマートフォンの場合はclickではなくタッチを使う
-      const touchclick = window.ontouchstart === null ? 'touchstart' : 'mousedown'
-      // ボタンにイベントリスナーをつける
-      Object.keys(buttons)
-        .forEach(type => buttons[type]
-          .addEventListener(touchclick, createClickLisnter(type))
-        )
-        
-
-      // キーボードでの操作の定義 (ボタン押下時)
-      document.addEventListener('keydown', e => {
-
-        // クリックとエフェクトのエミュレートする関数を作成
-        const emulateClick = element => {
-          element.classList.add('is-active')
-          element.click()
+  // iOSで、画面ダブルタップで拡大してしまうのを防ぐ
+  {
+    let flag = false
+    localDocument[addEventListener](
+      'touchend',
+      event => {
+        if (flag) {
+          event.preventDefault()
+        } else {
+          flag = true
+          setTimeout(() => (flag = false), 500)
         }
-        keyMap[e.keyCode] && emulateClick(buttons[keyMap[e.keyCode]])
-      })
+      },
+      true
+    )
+  }
 
-      // キーボードでの操作の定義 (ボタンを離した時)
-      document.addEventListener('keyup', e => (
-        // ボタンのアクティブ状態を解除する
-        Object.values(buttons)
-          .forEach(element => element.classList.remove('is-active'))
-      ))
-    </script>
+  // ボタン種類の定義とキーマップを定義
+  let keyMap = {
+    38: 'front',
+    37: 'left',
+    39: 'right',
+    40: 'back',
+    32: 'stop' // スペース
+  }
+  // ボタンのイベントクリックのリスナーを作成
+  let createClickLisnter = type => () => fetch('?' + type + '=1')
+
+  // ボタンエレメントの取得
+  let buttons = LocalObject.values(keyMap).reduce((prev, type) => {
+    prev[type] = document.getElementById(type)
+    return prev
+  }, {})
+
+  // スマートフォンの場合はclickではなくタッチを使う
+  let touchclick = window.ontouchstart === null ? 'touchstart' : 'mousedown'
+  // ボタンにイベントリスナーをつける
+  LocalObject.keys(buttons).forEach(type =>
+    buttons[type][addEventListener](touchclick, createClickLisnter(type))
+  )
+
+  // キーボードでの操作の定義 (ボタン押下時)
+  localDocument[addEventListener]('keydown', e => {
+    // クリックとエフェクトのエミュレートする関数を作成
+    let emulateClick = element => {
+      element.classList.add('is-active')
+      createClickLisnter(element.id)()
+    }
+    let type = keyMap[e.keyCode]
+    type && emulateClick(buttons[type])
+  })
+
+  // キーボードでの操作の定義 (ボタンを離した時)
+  localDocument[addEventListener]('keyup', e =>
+    // ボタンのアクティブ状態を解除する
+    LocalObject.values(buttons).forEach(element =>
+      element.classList.remove('is-active')
+    )
+  )
+}
+</script>
   </body>
 </html>
